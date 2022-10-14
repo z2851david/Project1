@@ -38,6 +38,7 @@ def main_body():
     font = pygame.font.Font("freesansbold.ttf", 28)
     font2 = pygame.font.Font("freesansbold.ttf", 32)
     font3=pygame.font.Font("freesansbold.ttf", 18)
+    font4=pygame.font.Font("freesansbold.ttf",50)
     cursor = pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_ARROW)
     pygame.mouse.set_cursor(cursor)
     running = True  # condition for game loop
@@ -48,6 +49,8 @@ def main_body():
     setting_obj.scale = 10  # pixels for 1 meter
     prev_time=time.time()
     clock = pygame.time.Clock()
+    RECORD_EVENT=pygame.USEREVENT+1
+    coord_list=[[]]
 
 
     while running:  # main game loop
@@ -75,11 +78,11 @@ def main_body():
             setting_obj.reset_obj = False
 
         # ===================================Background==============================================================#
-
         clock.tick(FPS)
         now_time=time.time()
         setting_obj.delta_time=now_time-prev_time
         prev_time=now_time
+        pygame.time.set_timer(pygame.MOUSEBUTTONDOWN,1000)
         WIN = pygame.display.set_mode((setting_obj.window_width, setting_obj.window_height),
                                       flags=pygame.SHOWN | pygame.FULLSCREEN)
         WIN.fill("gray")
@@ -89,7 +92,7 @@ def main_body():
                                    setting_obj.window_width // 3, setting_obj.window_height)
         pygame.draw.rect(WIN, "white", setting_rect, 0)
         WIN.blit(grass, (0, setting_obj.window_height // 1.3))
-        setting_label = font2.render("Settings", True, "black")
+        setting_label = font4.render("Settings", True, "black")
         setting_label_rect = setting_label.get_rect()
         setting_label_rect.center = (setting_obj.window_width - 320, 70)
         information_label = font3.render("Settings will be saved after reset", True, "black")
@@ -109,11 +112,11 @@ def main_body():
             init_buttons(WIN, setting_obj,red_circle)
             setting_obj.initalise_counter+=1
         if setting_obj.slider_counter==0:
-            vel_slider = Slider(WIN, setting_obj.setting_side_width + 200, 200, 200, 40, min=0, max=35, step=1,
+            vel_slider = Slider(WIN, setting_obj.setting_side_width + 200, 200, 200, 30, min=0, max=35, step=1,
                                 initial=0)
             output = TextBox(WIN, setting_obj.setting_side_width + 450, 200, 40, 40)
             output.disable()
-            angle_slider = Slider(WIN, setting_obj.setting_side_width + 200, 300, 200, 40, min=0, max=90, step=1,
+            angle_slider = Slider(WIN, setting_obj.setting_side_width + 200, 300, 200, 30, min=0, max=90, step=1,
                                   initial=0)
             output2 = TextBox(WIN, setting_obj.setting_side_width + 450, 300, 40, 40)
             output2.disable()
@@ -125,6 +128,13 @@ def main_body():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
+
+            if event.type==pygame.MOUSEBUTTONDOWN:
+                x_coord=red_circle.x_pos
+                y_coord=red_circle.y_pos
+                coord_list.append([x_coord,y_coord])
+                for n in range(len(coord_list)):
+                    print(coord_list[n])
         if setting_obj.setting_projectile == "circle":
             if setting_obj.is_run == False:
                 red_circle.set_vel(vel_slider.getValue(), angle_slider.getValue())
@@ -135,6 +145,8 @@ def main_body():
 
                 elif setting_obj.setting_motion == "horizontal":
                     pygame.draw.circle(WIN, "red", (red_circle.x_pos, red_circle.y_pos), red_circle.radius, 0)
+
+
 
 
 
@@ -155,6 +167,6 @@ def main_body():
         pygame.display.flip()
 
 
+
 if __name__ == "__main__":
     main_body()
-
