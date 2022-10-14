@@ -1,4 +1,4 @@
-import pygame,time
+iimport pygame,time
 from projectiles import initiate_circle, move_circle
 from start_menu import menu1, menu2
 from buttons import display_information_text,init_buttons
@@ -49,8 +49,8 @@ def main_body():
     setting_obj.scale = 10  # pixels for 1 meter
     prev_time=time.time()
     clock = pygame.time.Clock()
-    RECORD_EVENT=pygame.USEREVENT+1
-    coord_list=[[]]
+    RECORD_EVENT=pygame.USEREVENT
+    coord_list=[]
 
 
     while running:  # main game loop
@@ -129,7 +129,7 @@ def main_body():
             if event.type == pygame.QUIT:
                 quit()
 
-            if event.type==pygame.MOUSEBUTTONDOWN:
+            if event.type==RECORD_EVENT:
                 x_coord=red_circle.x_pos
                 y_coord=red_circle.y_pos
                 coord_list.append([x_coord,y_coord])
@@ -152,6 +152,8 @@ def main_body():
 
             # ===================================Move object==========================================================#
             elif setting_obj.is_run == True and setting_obj.is_run_after == True:
+                for n in coord_list:
+                    pygame.draw.circle(WIN,"red",(n[0],n[1]),10,0)
                 move_circle(red_circle, WIN, setting_obj)
 
 
