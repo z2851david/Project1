@@ -1,4 +1,4 @@
-iimport pygame,time
+import pygame,time
 from projectiles import initiate_circle, move_circle
 from start_menu import menu1, menu2
 from buttons import display_information_text,init_buttons
@@ -29,6 +29,7 @@ class Settings():
         self.FPS=60
         self.initalise_counter=0
         self.slider_counter=0
+        self.coord_list=[]
 
 
 def main_body():
@@ -49,8 +50,8 @@ def main_body():
     setting_obj.scale = 10  # pixels for 1 meter
     prev_time=time.time()
     clock = pygame.time.Clock()
-    RECORD_EVENT=pygame.USEREVENT
-    coord_list=[]
+    record_coord_event=pygame.USEREVENT+1
+    pygame.time.set_timer(record_coord_event, 500)
 
 
     while running:  # main game loop
@@ -82,7 +83,6 @@ def main_body():
         now_time=time.time()
         setting_obj.delta_time=now_time-prev_time
         prev_time=now_time
-        pygame.time.set_timer(pygame.MOUSEBUTTONDOWN,1000)
         WIN = pygame.display.set_mode((setting_obj.window_width, setting_obj.window_height),
                                       flags=pygame.SHOWN | pygame.FULLSCREEN)
         WIN.fill("gray")
@@ -94,16 +94,20 @@ def main_body():
         WIN.blit(grass, (0, setting_obj.window_height // 1.3))
         setting_label = font4.render("Settings", True, "black")
         setting_label_rect = setting_label.get_rect()
-        setting_label_rect.center = (setting_obj.window_width - 320, 70)
-        information_label = font3.render("Settings will be saved after reset", True, "black")
+        setting_label_rect.center = (setting_obj.setting_side_width + setting_obj.vertical_width*0.5,
+                                     setting_obj.window_height*0.08)
+        information_label = font3.render("Press 'reset' to save changes", True, "black")
         information_label_rect = information_label.get_rect()
-        information_label_rect.center = (setting_obj.setting_side_width + 165, 165)
+        information_label_rect.center = (setting_obj.setting_side_width + setting_obj.vertical_width*0.35,
+                                         setting_obj.window_height*0.18)
         vel_label = font2.render("Velocity", True, "black")
         vel_label_rect = vel_label.get_rect()
-        vel_label_rect.center = (setting_obj.setting_side_width+90, 218)
+        vel_label_rect.center = (setting_obj.setting_side_width+setting_obj.vertical_width*0.18,
+                                 setting_obj.window_height*0.25)
         angle_label= font2.render("Angle", True, "black")
         angle_label_rect = angle_label.get_rect()
-        angle_label_rect.center = (setting_obj.setting_side_width+90, 318)
+        angle_label_rect.center = (setting_obj.setting_side_width+setting_obj.vertical_width*0.14,
+                                   int(setting_obj.window_height*0.36))
         WIN.blit(information_label,information_label_rect)
         WIN.blit(angle_label,angle_label_rect)
         WIN.blit(vel_label,vel_label_rect)
@@ -112,13 +116,23 @@ def main_body():
             init_buttons(WIN, setting_obj,red_circle)
             setting_obj.initalise_counter+=1
         if setting_obj.slider_counter==0:
-            vel_slider = Slider(WIN, setting_obj.setting_side_width + 200, 200, 200, 30, min=0, max=35, step=1,
+            vel_slider = Slider(WIN, int(setting_obj.setting_side_width + setting_obj.vertical_width*0.43),
+                                int(setting_obj.window_height*0.2334),
+                                setting_obj.setting_side_width*0.2, int(setting_obj.window_height*0.0395)
+                                , min=0, max=35, step=1,
                                 initial=0)
-            output = TextBox(WIN, setting_obj.setting_side_width + 450, 200, 40, 40)
+            output = TextBox(WIN, setting_obj.setting_side_width + setting_obj.setting_side_width*0.44,
+                             setting_obj.window_height * 0.227
+                             , 40, 40)
             output.disable()
-            angle_slider = Slider(WIN, setting_obj.setting_side_width + 200, 300, 200, 30, min=0, max=90, step=1,
+            angle_slider = Slider(WIN, int(setting_obj.setting_side_width + setting_obj.vertical_width*0.43),
+                                  int(setting_obj.window_height*0.34), setting_obj.setting_side_width*0.2,
+                                  int(setting_obj.window_height*0.0395),
+                                  min=0, max=90, step=1,
                                   initial=0)
-            output2 = TextBox(WIN, setting_obj.setting_side_width + 450, 300, 40, 40)
+            output2 = TextBox(WIN, setting_obj.setting_side_width + setting_obj.setting_side_width*0.44,
+                              int(setting_obj.window_height*0.33), 40
+                              , 40)
             output2.disable()
             setting_obj.slider_counter=1
         # =====================================Object is stationary==================================================#
@@ -129,12 +143,10 @@ def main_body():
             if event.type == pygame.QUIT:
                 quit()
 
-            if event.type==RECORD_EVENT:
-                x_coord=red_circle.x_pos
-                y_coord=red_circle.y_pos
-                coord_list.append([x_coord,y_coord])
-                for n in range(len(coord_list)):
-                    print(coord_list[n])
+            if event.type==record_coord_event:
+                setting_obj.coord_list.append([red_circle.x_pos,red_circle.y_pos])
+                for n in range(len(setting_obj.coord_list)):
+                    print(setting_obj.coord_list)
         if setting_obj.setting_projectile == "circle":
             if setting_obj.is_run == False:
                 red_circle.set_vel(vel_slider.getValue(), angle_slider.getValue())
@@ -152,7 +164,7 @@ def main_body():
 
             # ===================================Move object==========================================================#
             elif setting_obj.is_run == True and setting_obj.is_run_after == True:
-                for n in coord_list:
+                for n in setting_obj.coord_list:
                     pygame.draw.circle(WIN,"red",(n[0],n[1]),10,0)
                 move_circle(red_circle, WIN, setting_obj)
 
