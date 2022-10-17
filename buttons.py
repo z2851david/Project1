@@ -46,6 +46,7 @@ def restart_button_func(setting_obj,red_circle):
     setting_obj.reset_obj = True
     setting_obj.is_run = False
     setting_obj.is_run_after=True
+    setting_obj.coord_list=[]
     red_circle.__del__()
 
 
