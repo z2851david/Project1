@@ -25,7 +25,7 @@ class Graph():
             self.ax.set_ylabel("velocity/ms^-1",c="red")
             self.ax.set_xlabel("Time/s",c="red")
             self.ax.xaxis.set_label_coords(1,-0.01)
-            self.ax.yaxis.set_label_coords(0.05,1)  
+            self.ax.yaxis.set_label_coords(0.05,1)
     def clear(self):
         self.ax.cla()
     def create_graph(self,WIN,setting_obj):
@@ -54,7 +54,7 @@ def init_buttons(WIN,setting_obj,red_circle,displacement_time_graph):
 
 
     multiple_graphs_toggle=Toggle(WIN,int(setting_obj.setting_side_width+setting_obj.vertical_width*0.55),
-                                  int(setting_obj.window_height*0.634),30,24,startOn=False)
+                                  int(setting_obj.window_height*0.63),30,24,startOn=False)
 
 
     menu_button = Button(WIN, setting_obj.setting_side_width + setting_obj.vertical_width*0.43,
@@ -65,12 +65,14 @@ def init_buttons(WIN,setting_obj,red_circle,displacement_time_graph):
         setting_obj.window_height * 0.85, 80, 80, text="Exit", onClick=lambda: quit(),
         fontSize=24)
 
-    restart_button = Button(WIN, setting_obj.setting_side_width + setting_obj.vertical_width*0.22,
+    restart_button = Button(WIN,setting_obj.setting_side_width + setting_obj.vertical_width*0.22,
                             setting_obj.window_height*0.85, 80, 80,
                             text="Reset", onClick=lambda: restart_button_func(setting_obj, red_circle,
                                                                               displacement_time_graph),
                             fontSize=24)
-    return displacement_graph_toggle,velocity_graph_toggle,multiple_graphs_toggle
+    axes_toggle=Toggle(WIN,int(setting_obj.setting_side_width+setting_obj.vertical_width*0.27),
+                       int(setting_obj.window_height*0.79),30,24,startOn=False)
+    return displacement_graph_toggle,velocity_graph_toggle,multiple_graphs_toggle,axes_toggle
 
 def init_sliders(WIN,setting_obj):
     vel_slider = Slider(WIN, int(setting_obj.setting_side_width + setting_obj.vertical_width * 0.32),
@@ -100,10 +102,10 @@ def init_sliders(WIN,setting_obj):
     output3.disable()
 
     pillar_slider=Slider(WIN,int(setting_obj.setting_side_width+setting_obj.vertical_width*0.32),
-                         int(setting_obj.window_height*0.74),setting_obj.vertical_width*0.37,20,
+                         int(setting_obj.window_height*0.722),setting_obj.vertical_width*0.37,20,
                          min=0,max=30,step=1,initial=0)
     output4=TextBox(WIN,setting_obj.setting_side_width+setting_obj.vertical_width*0.74,
-                    int(setting_obj.window_height*0.725),40,40)
+                    int(setting_obj.window_height*0.71),40,40)
     output4.disable()
 
 
@@ -143,6 +145,8 @@ def restart_button_func(setting_obj,red_circle,displacement_time_graph):
         setting_obj.graph_list_n+=1
     setting_obj.coord_list=[[],[]]
     setting_obj.displacement_time_counter=0
+    setting_obj.lines_displacement_list=[]
+    setting_obj.lines_height_list=[]
     try:
         displacement_time_graph.clear()
     except:
@@ -192,16 +196,26 @@ def set_background(setting_obj,WIN,font4,font3,font2):
     multiple_graphs_label1=font2.render("Show multiple", True, "black")
     multiple_graphs_rect1=multiple_graphs_label1.get_rect()
     multiple_graphs_rect1.center=(setting_obj.setting_side_width+setting_obj.vertical_width*0.23,
-                                  setting_obj.window_height*0.63)
+                                  setting_obj.window_height*0.62)
     multiple_graphs_label2=font2.render("graphs", True, "black")
     multiple_graphs_rect2=multiple_graphs_label2.get_rect()
     multiple_graphs_rect2.center=(setting_obj.setting_side_width+setting_obj.vertical_width*0.23,
-                                  setting_obj.window_height*0.67)
+                                  setting_obj.window_height*0.65)
 
     zoom_label=font2.render("Zoom", True, "black")
     zoom_rect=zoom_label.get_rect()
     zoom_rect.center=(setting_obj.setting_side_width+setting_obj.vertical_width*0.11,
                       setting_obj.window_height*0.54)
+
+    pillar_label=font2.render("Height",True,"black")
+    pillar_rect=pillar_label.get_rect()
+    pillar_rect.center=(setting_obj.setting_side_width+setting_obj.vertical_width*0.13,
+                        setting_obj.window_height*0.735)
+
+    axes_label=font2.render("Axes",True,"black")
+    axes_rect=axes_label.get_rect()
+    axes_rect.center=(setting_obj.setting_side_width+setting_obj.vertical_width*0.1,
+                      setting_obj.window_height*0.805)
 
     WIN.blit(information_label, information_label_rect)
     WIN.blit(angle_label, angle_label_rect)
@@ -213,6 +227,8 @@ def set_background(setting_obj,WIN,font4,font3,font2):
     WIN.blit(zoom_label,zoom_rect)
     WIN.blit(multiple_graphs_label1,multiple_graphs_rect1)
     WIN.blit(multiple_graphs_label2,multiple_graphs_rect2)
+    WIN.blit(pillar_label,pillar_rect)
+    WIN.blit(axes_label,axes_rect)
 
 
 
@@ -222,12 +238,12 @@ def menu_button_func(setting_obj):
 
 def display_information_text(red_circle,WIN,setting_obj):
     font = pygame.font.Font("freesansbold.ttf", 14)
-    text = font.render(f"vertical velocity={int(red_circle.old_vel)}", True, "black")
+    text = font.render(f"vertical velocity={int(red_circle.old_vel)} m/s", True, "black")
     textrect = text.get_rect()
-    text2 = font.render(f"horizontal veocity={int(red_circle.horizontal_vel)}", True, "black")
+    text2 = font.render(f"horizontal veocity={int(red_circle.horizontal_vel)} m/s", True, "black")
     textrect2 = text.get_rect()
-    textrect.center = (setting_obj.setting_side_width*0.9,setting_obj.window_height *0.79)
-    textrect2.center=(setting_obj.setting_side_width*0.9,setting_obj.window_height *0.82)
+    textrect.center = (setting_obj.setting_side_width*0.89,setting_obj.window_height *0.825)
+    textrect2.center=(setting_obj.setting_side_width*0.89,setting_obj.window_height *0.85)
     WIN.blit(text, textrect)
     WIN.blit(text2,textrect2)
 
