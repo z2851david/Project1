@@ -52,7 +52,7 @@ def initiate_circle(setting_motion,setting_obj):
     if setting_motion=="vertical":
         red_circle=Ball(20,[setting_obj.vertical_width/2,0],0,0,10,setting_obj.setting_side_width//2)
     elif setting_motion=="horizontal":
-        red_circle=Ball(20,[20,setting_obj.window_height//1.3],35,60,setting_obj.window_height//1.3-20,22)
+        red_circle=Ball(20,[20,setting_obj.window_height//1.3],35,60,setting_obj.window_height//1.3-20,50)
     return red_circle
 
 
