@@ -1,4 +1,3 @@
-import matplotlib.colors
 import matplotlib.pyplot as plt
 import pygame,time,pygame_widgets
 from projectiles import initiate_circle, move_circle
@@ -44,6 +43,11 @@ class Settings():
         self.pillar_height=0
         self.colors=["#1f77b4","#ff7f0e","#2ca02c","#d62728","#9467bd",
                      "#8c564b","#e377c2","#7f7f7f","#bcbd22","#17becf"]
+        self.lines_counter=0
+        self.lines_height=0
+        self.lines_displacement=0
+        self.lines_displacement_list=[]
+        self.lines_height_list=[]
 def main_body():
     setting_obj = Settings()
     setting_obj.window_width = 400
@@ -52,6 +56,7 @@ def main_body():
     font2 = pygame.font.Font("freesansbold.ttf", 24)
     font3=pygame.font.Font("freesansbold.ttf", 14)
     font4=pygame.font.Font("freesansbold.ttf",46)
+    font5=pygame.font.Font("freesansbold.ttf",10)
     cursor = pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_ARROW)
     pygame.mouse.set_cursor(cursor)
     slider_counter=0
@@ -104,7 +109,7 @@ def main_body():
         WIN.fill("#46aefc")
 
         if setting_obj.initalise_counter==0:
-            displacement_graph_toggle,velocity_graph_toggle,multiple_graphs_toggle\
+            displacement_graph_toggle,velocity_graph_toggle,multiple_graphs_toggle,axes_toggle\
                 =init_buttons(WIN, setting_obj,red_circle,graphs)
             setting_obj.initalise_counter+=1
         if slider_counter==0:
@@ -195,13 +200,52 @@ def main_body():
         else:
             setting_obj.draw_multiple_graphs=False
         setting_obj.pillar_height=pillar_slider.getValue()
-        pillar_rect = pygame.Rect(12, setting_obj.window_height//1.3-
+        pillar_rect = pygame.Rect(40, setting_obj.window_height//1.3-
                                   (setting_obj.pillar_height*setting_obj.base_scale),
                                    red_circle.radius, setting_obj.pillar_height*setting_obj.base_scale)
 
-        pygame.draw.rect(WIN,"orange",pillar_rect)
-
+        pygame.draw.rect(WIN,"brown",pillar_rect)
         set_background(setting_obj, WIN, font4, font3, font2)
+
+        if axes_toggle.getValue() and setting_obj.setting_motion=="horizontal":
+            if red_circle.vertical_vel>=0 and not red_circle.stop_y_motion\
+                and not red_circle.y_pos-20<=0:
+                setting_obj.lines_height=red_circle.y_pos
+            if not setting_obj.is_run:
+                y_ax=pygame.rect.Rect(30,setting_obj.window_height//1.3,10,0)
+            else:
+                y_ax=pygame.rect.Rect(30,setting_obj.lines_height,10,
+                                        setting_obj.window_height//1.3-setting_obj.lines_height+1)
+            pygame.draw.rect(WIN,"black",y_ax,5,0)
+            if red_circle.stop_y_motion:
+                for n in range(11):
+                    temp_height = ((setting_obj.window_height//1.3-setting_obj.lines_height) / 10) * n
+                    sub_y_ax = pygame.rect.Rect(20,setting_obj.window_height//1.3-temp_height, 14, 5)
+                    pygame.draw.rect(WIN, "black", sub_y_ax, 5, 0)
+                    y_axis_ticks = font5.render(f"{int(temp_height/ setting_obj.scale)}", True, "black")
+                    y_axis_ticks_rect = y_axis_ticks.get_rect()
+                    y_axis_ticks_rect.center = (10, setting_obj.window_height//1.3-temp_height)
+                    WIN.blit(y_axis_ticks, y_axis_ticks_rect)
+
+        if axes_toggle.getValue() and setting_obj.setting_motion=="horizontal":
+            if red_circle.horizontal_vel>=0 and not red_circle.stop_y_motion\
+                    and not red_circle.x_pos+50>=setting_obj.setting_side_width:
+                setting_obj.lines_displacement=red_circle.x_pos
+            if not setting_obj.is_run:
+                setting_obj.lines_displacement = 0
+            if red_circle.stop_y_motion:
+                for n in range(11):
+                    temp_displacement=(setting_obj.lines_displacement/10)*n
+                    sub_x_ax=pygame.rect.Rect(temp_displacement+30
+                                                ,setting_obj.window_height//1.3,6,20)
+                    pygame.draw.rect(WIN, "black", sub_x_ax, 5, 0)
+                    x_axis_ticks=font5.render(f"{int(temp_displacement/setting_obj.scale)}",True,"black")
+                    x_axis_ticks_rect=x_axis_ticks.get_rect()
+                    x_axis_ticks_rect.center=(temp_displacement+35,setting_obj.window_height//1.3+27)
+                    WIN.blit(x_axis_ticks,x_axis_ticks_rect)
+
+            x_ax=pygame.rect.Rect(30,setting_obj.window_height//1.3,setting_obj.lines_displacement,10)
+            pygame.draw.rect(WIN,"black",x_ax,5,0)
         display_information_text(red_circle, WIN,setting_obj)
         output.setText(vel_slider.getValue())
         output2.setText(angle_slider.getValue())
