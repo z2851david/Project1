@@ -218,11 +218,15 @@ def main_body():
                                         setting_obj.window_height//1.3-setting_obj.lines_height+1)
             pygame.draw.rect(WIN,"black",y_ax,5,0)
             if red_circle.stop_y_motion:
-                for n in range(11):
-                    temp_height = ((setting_obj.window_height//1.3-setting_obj.lines_height) / 10) * n
+                if setting_obj.window_height//1.3-setting_obj.lines_height < 100:
+                    height_iterator = round(setting_obj.window_height//1.3-setting_obj.lines_height / 10)
+                else:
+                    height_iterator = round(setting_obj.window_height//1.3-setting_obj.lines_height / 100)
+                for n in range(height_iterator):
+                    temp_height = ((setting_obj.window_height//1.3-setting_obj.lines_height)/height_iterator) * n
                     sub_y_ax = pygame.rect.Rect(20,setting_obj.window_height//1.3-temp_height, 14, 5)
                     pygame.draw.rect(WIN, "black", sub_y_ax, 5, 0)
-                    y_axis_ticks = font5.render(f"{int(temp_height/ setting_obj.scale)}", True, "black")
+                    y_axis_ticks = font5.render(f"{round(temp_height/ setting_obj.scale)}", True, "black")
                     y_axis_ticks_rect = y_axis_ticks.get_rect()
                     y_axis_ticks_rect.center = (10, setting_obj.window_height//1.3-temp_height)
                     WIN.blit(y_axis_ticks, y_axis_ticks_rect)
@@ -234,12 +238,16 @@ def main_body():
             if not setting_obj.is_run:
                 setting_obj.lines_displacement = 0
             if red_circle.stop_y_motion:
-                for n in range(11):
-                    temp_displacement=(setting_obj.lines_displacement/10)*n
+                if setting_obj.lines_displacement<100:
+                    displacement_iterator=round(setting_obj.lines_displacement/10)
+                else:
+                    displacement_iterator=round(setting_obj.lines_displacement / 100)
+                for n in range(displacement_iterator+1):
+                    temp_displacement=(setting_obj.lines_displacement/displacement_iterator)*n
                     sub_x_ax=pygame.rect.Rect(temp_displacement+30
                                                 ,setting_obj.window_height//1.3,6,20)
                     pygame.draw.rect(WIN, "black", sub_x_ax, 5, 0)
-                    x_axis_ticks=font5.render(f"{int(temp_displacement/setting_obj.scale)}",True,"black")
+                    x_axis_ticks=font5.render(f"{round(temp_displacement/setting_obj.scale)}",True,"black")
                     x_axis_ticks_rect=x_axis_ticks.get_rect()
                     x_axis_ticks_rect.center=(temp_displacement+35,setting_obj.window_height//1.3+27)
                     WIN.blit(x_axis_ticks,x_axis_ticks_rect)
