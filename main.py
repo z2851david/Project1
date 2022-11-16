@@ -208,6 +208,7 @@ def main_body():
         set_background(setting_obj, WIN, font4, font3, font2)
 
         if axes_toggle.getValue() and setting_obj.setting_motion=="horizontal":
+
             if red_circle.vertical_vel>=0 and not red_circle.stop_y_motion\
                 and not red_circle.y_pos-20<=0:
                 setting_obj.lines_height=red_circle.y_pos
@@ -218,11 +219,11 @@ def main_body():
                                         setting_obj.window_height//1.3-setting_obj.lines_height+1)
             pygame.draw.rect(WIN,"black",y_ax,5,0)
             if red_circle.stop_y_motion:
-                if setting_obj.window_height//1.3-setting_obj.lines_height < 100:
-                    height_iterator = round(setting_obj.window_height//1.3-setting_obj.lines_height / 10)
+                if (setting_obj.window_height//1.3)-setting_obj.lines_height < 100:
+                    height_iterator = round(((setting_obj.window_height//1.3)-setting_obj.lines_height)/ 10)
                 else:
-                    height_iterator = round(setting_obj.window_height//1.3-setting_obj.lines_height / 100)
-                for n in range(height_iterator):
+                    height_iterator = round(((setting_obj.window_height//1.3)-setting_obj.lines_height) / 100)
+                for n in range(height_iterator+1):
                     temp_height = ((setting_obj.window_height//1.3-setting_obj.lines_height)/height_iterator) * n
                     sub_y_ax = pygame.rect.Rect(20,setting_obj.window_height//1.3-temp_height, 14, 5)
                     pygame.draw.rect(WIN, "black", sub_y_ax, 5, 0)
