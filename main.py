@@ -206,12 +206,13 @@ def main_body():
 
         pygame.draw.rect(WIN,"brown",pillar_rect)
         set_background(setting_obj, WIN, font4, font3, font2)
+        if not red_circle.y_pos-20<=0 and red_circle.vertical_vel>=0 and not red_circle.stop_y_motion:
+            setting_obj.lines_height = red_circle.y_pos
+        if red_circle.horizontal_vel >= 0 and not red_circle.x_pos + 50 >= setting_obj.setting_side_width:
+            setting_obj.lines_displacement = red_circle.x_pos
 
         if axes_toggle.getValue() and setting_obj.setting_motion=="horizontal":
 
-            if red_circle.vertical_vel>=0 and not red_circle.stop_y_motion\
-                and not red_circle.y_pos-20<=0:
-                setting_obj.lines_height=red_circle.y_pos
             if not setting_obj.is_run:
                 y_ax=pygame.rect.Rect(30,setting_obj.window_height//1.3,10,0)
             else:
@@ -233,9 +234,7 @@ def main_body():
                     WIN.blit(y_axis_ticks, y_axis_ticks_rect)
 
         if axes_toggle.getValue() and setting_obj.setting_motion=="horizontal":
-            if red_circle.horizontal_vel>=0 and not red_circle.stop_y_motion\
-                    and not red_circle.x_pos+50>=setting_obj.setting_side_width:
-                setting_obj.lines_displacement=red_circle.x_pos
+
             if not setting_obj.is_run:
                 setting_obj.lines_displacement = 0
             if red_circle.stop_y_motion:
