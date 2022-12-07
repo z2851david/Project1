@@ -13,29 +13,35 @@ WIDTH,HEIGHT=800,400
 class Projectile:
 
     def __init__(self,vel,angle, y_pos, x_pos):
-        self.acceleration = 9.80665  # accepted value of gravitational acceleration
-        self.initial_vel=vel
-        self.vel_before_motion=self.initial_vel
+        self.g=-9.80665
+        self.vertical_acceleration =self.g # accepted value of gravitational acceleration
+        self.horizontal_acceleration=0
+        self.vel_before_motion=vel
         self.vertical_vel=0
-        self.angle = math.radians(angle)
-        self.horizontal_vel = self.initial_vel * math.cos(self.angle)
-        self.old_vel = self.initial_vel * math.sin(self.angle)
+        self.initial_angle = math.radians(angle)
+        self.delta_theta=self.initial_angle
+        self.horizontal_vel = vel * math.cos(self.initial_angle)
+        self.old_vel = vel * math.sin(self.initial_angle)
+        self.current_velocity=math.sqrt((self.vertical_vel**2)+(self.horizontal_vel**2))
         self.y_pos = y_pos
         self.x_pos = x_pos
         self.stop_y_motion=False
-        self.drag_coefficient=0.1
+        self.drag_coefficient=0.0
+        self.drag=0
     def set_vel(self,initial_vel,angle):
         self.initial_vel=initial_vel
-        self.angle=math.radians(angle)
-        self.horizontal_vel = self.initial_vel * math.cos(self.angle)
-        self.old_vel = self.initial_vel * math.sin(self.angle)
-    def set_acceleration(self,setting_obj):
-        if self.vertical_vel < 0:
-            drag=(((self.drag_coefficient*self.area)/2)*((self.vertical_vel)**2))*setting_obj.delta_time
-            self.acceleration=((9.80665*self.mass)-(drag))/self.mass
-        if self.horizontal_vel > 0:
-            horizontal_acceleration = (self.drag_coefficient * self.mass * 9.80665) * setting_obj.delta_time
-            self.horizontal_vel = self.horizontal_vel - horizontal_acceleration
+        self.initial_angle=math.radians(angle)
+        self.horizontal_vel = self.initial_vel * math.cos(self.initial_angle)
+        self.old_vel = self.initial_vel * math.sin(self.initial_angle)
+    def set_acceleration(self):
+        self.drag=(((self.current_velocity)**2)*self.drag_coefficient*self.area)/2
+        vertical_drag=-(math.sin(self.delta_theta)*self.drag)
+        horizontal_drag=-(math.cos(self.delta_theta)*self.drag)
+        self.vertical_acceleration= (self.g + (vertical_drag/self.mass))
+        self.horizontal_acceleration=(horizontal_drag/self.mass)
+    def update_velocity_theta(self):
+        self.current_velocity=math.sqrt((self.vertical_vel**2)+(self.horizontal_vel**2))
+        self.delta_theta=math.atan(self.vertical_vel/self.horizontal_vel)
 
 
 
@@ -45,9 +51,10 @@ class Projectile:
 
 
     def motion(self,setting_object):
-        self.horizontal_vel = self.horizontal_vel
+
         if self.stop_y_motion==False:
-            self.vertical_vel = (-self.acceleration * setting_object.delta_time) + (self.old_vel)
+            self.vertical_vel = (self.vertical_acceleration*setting_object.delta_time) + self.old_vel
+            self.horizontal_vel = self.horizontal_vel + (self.horizontal_acceleration * setting_object.delta_time)
         self.old_vel=self.vertical_vel
         return self.vertical_vel,self.horizontal_vel
 
@@ -57,8 +64,9 @@ class Ball(Projectile):
         super().__init__(initial_vel,initial_angle,y_pos,x_pos)
         self.radius=radius
         self.center=center
-        self.mass=2
-        self.area=(((self.radius/10)**2)*math.pi*4)/2
+        self.mass=5.0
+        self.area=(((self.radius/50)**2)*math.pi*4)/2
+
 
 def initiate_circle(setting_motion,setting_obj):
 
@@ -71,7 +79,9 @@ def initiate_circle(setting_motion,setting_obj):
 
 
 def move_circle(red_circle,WIN,setting_obj):
-    red_circle.set_acceleration(setting_obj)
+    if red_circle.horizontal_vel>0 and red_circle.vertical_vel!=0:
+        red_circle.update_velocity_theta()
+        red_circle.set_acceleration()
     vertical_velocity,horizontal_velocity=red_circle.motion(setting_obj)
     red_circle.y_pos=red_circle.y_pos-(vertical_velocity*setting_obj.delta_time)*setting_obj.scale
     red_circle.x_pos=red_circle.x_pos+(horizontal_velocity *setting_obj.delta_time)*setting_obj.scale
