@@ -215,9 +215,6 @@ def init_sliders(WIN,setting_obj):
 
 
 
-
-
-
 def start_stop_button_func(setting_obj):
     if setting_obj.is_run==False:
         setting_obj.is_run=True
