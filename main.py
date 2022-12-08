@@ -33,6 +33,7 @@ class Settings():
         self.base_scale=18
         self.FPS=60
         self.initalise_counter=0
+        self.trail_scale=1.2
         self.coord_list=[[],[]]
         self.vertical_displacement_list=[[]]
         self.horizontal_displacement_list=[[]]
@@ -82,8 +83,9 @@ def main_body():
     WIN = pygame.display.set_mode((setting_obj.window_width, setting_obj.window_height))
     prev_time=time.time()
     clock = pygame.time.Clock()
-    trail_timer=14
-    record_timer=4
+    trail_timer=9
+    trail_base=10
+    trail_max=trail_base
     displacement_time_prev_time=time.time()
     graphs=Graph()
 
@@ -120,7 +122,7 @@ def main_body():
         clock.tick(setting_obj.FPS)
         if setting_obj.is_run_after:
             trail_timer+=1
-            record_timer+=1
+
         now_time=time.time()
         setting_obj.delta_time=now_time-prev_time
         prev_time=now_time
@@ -138,28 +140,29 @@ def main_body():
                 =init_sliders(WIN,setting_obj)
             slider_counter = 1
 
+
+
 #=============================================RECORD DATA FOR GRAPHS==================================================#
-        if trail_timer == 15:
+        if trail_timer == trail_max:
             trail_timer = 0
             if setting_obj.is_run and not red_circle.stop_y_motion:
                 setting_obj.coord_list[0].append(red_circle.x_pos)
                 setting_obj.coord_list[1].append(red_circle.y_pos)
-        if record_timer==5:
-            record_timer=0
-            if setting_obj.is_run:
-               if not red_circle.stop_y_motion:
-                   height= (setting_obj.initial_y - red_circle.y_pos)/setting_obj.base_scale
-                   length=red_circle.x_pos/setting_obj.base_scale
-                   graph_displacement=math.sqrt((length**2)+(height**2))
-                   setting_obj.vertical_displacement_list[setting_obj.graph_list_n].append(height / setting_obj.scale)
-                   setting_obj.horizontal_displacement_list[setting_obj.graph_list_n].append(length/setting_obj.scale)
-                   setting_obj.angle_list[setting_obj.graph_list_n].append(red_circle.delta_theta)
-                   displacement_time_now_time = time.time()
-                   displacement_time_delta_time = displacement_time_now_time - displacement_time_prev_time
-                   setting_obj.time_list[setting_obj.graph_list_n].append(displacement_time_delta_time)
-                   setting_obj.vertical_velocity_list[setting_obj.graph_list_n].append(red_circle.vertical_vel)
-                   setting_obj.displacement_list[setting_obj.graph_list_n].append(graph_displacement)
-                   setting_obj.speed_list[setting_obj.graph_list_n].append(red_circle.current_velocity)
+
+        if setting_obj.is_run:
+            if not red_circle.stop_y_motion:
+                height= (setting_obj.initial_y - red_circle.y_pos)/setting_obj.base_scale
+                length=red_circle.x_pos/setting_obj.base_scale
+                graph_displacement=math.sqrt((length**2)+(height**2))
+                setting_obj.vertical_displacement_list[setting_obj.graph_list_n].append(height / setting_obj.scale)
+                setting_obj.horizontal_displacement_list[setting_obj.graph_list_n].append(length/setting_obj.scale)
+                setting_obj.angle_list[setting_obj.graph_list_n].append(red_circle.delta_theta)
+                displacement_time_now_time = time.time()
+                displacement_time_delta_time = displacement_time_now_time - displacement_time_prev_time
+                setting_obj.time_list[setting_obj.graph_list_n].append(displacement_time_delta_time)
+                setting_obj.vertical_velocity_list[setting_obj.graph_list_n].append(red_circle.vertical_vel)
+                setting_obj.displacement_list[setting_obj.graph_list_n].append(graph_displacement)
+                setting_obj.speed_list[setting_obj.graph_list_n].append(red_circle.current_velocity)
 
 
 #===================================================================================================================]
@@ -274,11 +277,17 @@ def main_body():
 
         ##====================================================================================================================#
 
-
         if zoom_slider.getValue()==0:
             setting_obj.scale=setting_obj.base_scale
+            trail_max=trail_base
+            setting_obj.slider_scale=setting_obj.slider_base_scale
         elif setting_obj.setting_motion=="horizontal":
             setting_obj.scale=setting_obj.base_scale*zoom_slider.getValue()
+            trail_max=round(trail_base*(setting_obj.trail_scale/zoom_slider.getValue()),0)
+            setting_obj.slider_scale=setting_obj.base_scale/zoom_slider.getValue()
+            if trail_timer>trail_max:
+                trail_timer=0
+
 
         if multiple_graphs_toggle.getValue():
             setting_obj.draw_multiple_graphs=True
