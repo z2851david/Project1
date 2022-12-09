@@ -58,6 +58,7 @@ class Settings():
         self.displacement_time_counter=0
         self.draw_multiple_graphs=True
         self.pillar_height=0
+        self.time_gap=0
         self.colors=["#1f77b4","#ff7f0e","#2ca02c","#d62728","#9467bd",
                      "#8c564b","#e377c2","#7f7f7f","#bcbd22","#17becf"]
         self.lines_counter=0
@@ -86,6 +87,8 @@ def main_body():
     trail_timer=9
     trail_base=10
     trail_max=trail_base
+    time_gap_counter=0
+    time_gap_counter2=1
     displacement_time_prev_time=time.time()
     graphs=Graph()
 
@@ -150,7 +153,7 @@ def main_body():
                 setting_obj.coord_list[1].append(red_circle.y_pos)
 
         if setting_obj.is_run:
-            if not red_circle.stop_y_motion:
+            if not red_circle.stop_y_motion and setting_obj.is_run_after:
                 height= (setting_obj.initial_y - red_circle.y_pos)/setting_obj.base_scale
                 length=red_circle.x_pos/setting_obj.base_scale
                 graph_displacement=math.sqrt((length**2)+(height**2))
@@ -159,7 +162,9 @@ def main_body():
                 setting_obj.angle_list[setting_obj.graph_list_n].append(red_circle.delta_theta)
                 displacement_time_now_time = time.time()
                 displacement_time_delta_time = displacement_time_now_time - displacement_time_prev_time
-                setting_obj.time_list[setting_obj.graph_list_n].append(displacement_time_delta_time)
+
+                setting_obj.time_list[setting_obj.graph_list_n].append(
+                    displacement_time_delta_time-setting_obj.time_gap)
                 setting_obj.vertical_velocity_list[setting_obj.graph_list_n].append(red_circle.vertical_vel)
                 setting_obj.displacement_list[setting_obj.graph_list_n].append(graph_displacement)
                 setting_obj.speed_list[setting_obj.graph_list_n].append(red_circle.current_velocity)
@@ -196,15 +201,29 @@ def main_body():
 
 
 #===============================================Move object==========================================================#
+
+
             elif setting_obj.is_run == True and setting_obj.is_run_after == True:
                 if setting_obj.displacement_time_counter==0:
                     displacement_time_prev_time=time.time()
-                    setting_obj.displacement_time_counter+=1
+                    setting_obj.displacement_time_counter=1
                 move_circle(red_circle, WIN, setting_obj)
 
 
             if setting_obj.is_run_after == False:
                 pygame.draw.circle(WIN, "red", (red_circle.x_pos, red_circle.y_pos), red_circle.radius, 0)
+
+            if not setting_obj.is_run_after:
+                if time_gap_counter==0:
+                    time_gap_start=time.time()
+                    time_gap_counter=1
+                    time_gap_counter2=0
+            else:
+                if time_gap_counter2==0:
+                    time_gap_end=time.time()-time_gap_start
+                    setting_obj.time_gap+=time_gap_end
+                    time_gap_counter=0
+                    time_gap_counter2=1
 
 #=====================================DRAW PATH======================================================================#
 
@@ -280,11 +299,9 @@ def main_body():
         if zoom_slider.getValue()==0:
             setting_obj.scale=setting_obj.base_scale
             trail_max=trail_base
-            setting_obj.slider_scale=setting_obj.slider_base_scale
         elif setting_obj.setting_motion=="horizontal":
             setting_obj.scale=setting_obj.base_scale*zoom_slider.getValue()
             trail_max=round(trail_base*(setting_obj.trail_scale/zoom_slider.getValue()),0)
-            setting_obj.slider_scale=setting_obj.base_scale/zoom_slider.getValue()
             if trail_timer>trail_max:
                 trail_timer=0
 
