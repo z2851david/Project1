@@ -92,9 +92,9 @@ def move_circle(red_circle,WIN,setting_obj):
         red_circle.horizontal_vel=0
         red_circle.stop_y_motion=True
 
-    #if red_circle.x_pos >= setting_obj.setting_side_width:
-        #red_circle.x_pos=setting_obj.setting_side_width-red_circle.radius # if ball goes over right-border
-        #red_circle.horizontal_vel=0
+    if red_circle.x_pos >= setting_obj.setting_side_width:
+        red_circle.x_pos=setting_obj.setting_side_width-red_circle.radius # if ball goes over right-border
+        red_circle.horizontal_vel=0
 
     if setting_obj.bounce==True:
 
@@ -137,4 +137,3 @@ def move_circle(red_circle,WIN,setting_obj):
 
     else:
         pygame.draw.circle(WIN,"red",(red_circle.x_pos,red_circle.y_pos),red_circle.radius,0)
-
