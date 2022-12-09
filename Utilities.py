@@ -254,6 +254,7 @@ def restart_button_func(setting_obj,red_circle,graphs):
     setting_obj.displacement_time_counter=0
     setting_obj.lines_displacement_list=[]
     setting_obj.lines_height_list=[]
+    setting_obj.time_gap=0
     graphs.clear()
     red_circle.__del__()
 
