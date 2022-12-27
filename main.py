@@ -135,7 +135,7 @@ def main_body():
 
         if setting_obj.initalise_counter==0:
             vertical_displacement_graph_toggle,vertical_velocity_graph_toggle,multiple_graphs_toggle,axes_toggle,\
-                displacement_graph_toggle,speed_graph_toggle,height_graph_toggle,range_graph_toggle,\
+                displacement_graph_toggle,speed_graph_toggle,height_graph_toggle,range_graph_toggle,bounce_toggle\
                 =init_buttons(WIN, setting_obj,red_circle,graphs)
             setting_obj.initalise_counter+=1
         if slider_counter==0:
@@ -365,6 +365,11 @@ def main_body():
 
             x_ax=pygame.rect.Rect(30,setting_obj.window_height//1.3,setting_obj.lines_displacement,10)
             pygame.draw.rect(WIN,"black",x_ax,5,0)
+
+        setting_obj.bounce=bounce_toggle.getValue()
+
+
+
         display_information_text(red_circle, WIN,setting_obj)
         output.setText(vel_slider.getValue())
         output2.setText(angle_slider.getValue())
