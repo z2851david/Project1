@@ -82,58 +82,41 @@ def move_circle(red_circle,WIN,setting_obj):
     if red_circle.horizontal_vel>0 and red_circle.vertical_vel!=0:
         red_circle.update_velocity_theta()
         red_circle.set_acceleration()
+
+
     vertical_velocity,horizontal_velocity=red_circle.motion(setting_obj)
     red_circle.y_pos=red_circle.y_pos-(vertical_velocity*setting_obj.delta_time)*setting_obj.scale
     red_circle.x_pos=red_circle.x_pos+(horizontal_velocity *setting_obj.delta_time)*setting_obj.scale
 
-    if red_circle.y_pos > setting_obj.window_height//1.3-red_circle.radius:  # if ball goes over border
-        red_circle.y_pos = setting_obj.window_height//1.3-red_circle.radius #go back same amount
-        red_circle.vertical_vel=0
-        red_circle.horizontal_vel=0
-        red_circle.stop_y_motion=True
+    if not setting_obj.bounce:
 
-    if red_circle.x_pos >= setting_obj.setting_side_width:
-        red_circle.x_pos=setting_obj.setting_side_width-red_circle.radius # if ball goes over right-border
-        red_circle.horizontal_vel=0
-
-    if setting_obj.bounce==True:
+        if red_circle.y_pos > setting_obj.window_height//1.3-red_circle.radius:  # if ball goes over border
+            red_circle.y_pos = setting_obj.window_height//1.3-red_circle.radius #go back same amount
+            red_circle.vertical_vel=0
+            red_circle.horizontal_vel=0
+            red_circle.stop_y_motion=True
 
         if red_circle.x_pos >= setting_obj.setting_side_width:
-            red_circle.horizontal_vel = -red_circle.horizontal_vel  # if ball goes over right-border
+            red_circle.x_pos=setting_obj.setting_side_width-red_circle.radius # if ball goes over right-border
+            red_circle.horizontal_vel=0
 
-            if red_circle.horizontal_vel>0 and red_circle.stop_y_motion!=True:
-                red_circle.horizontal_vel-=3
-                if red_circle.horizontal_vel<0:
+    if setting_obj.bounce:
+        if not red_circle.stop_y_motion:
+
+            if red_circle.y_pos >= setting_obj.window_height//1.3-red_circle.radius:
+                red_circle.y_pos = setting_obj.window_height//1.3-red_circle.radius
+                red_circle.vertical_vel+=1
+                if red_circle.vertical_vel> -4:
+                    red_circle.vertical_vel=0
                     red_circle.horizontal_vel=0
+                    red_circle.stop_y_motion=True
+                red_circle.old_vel=-red_circle.vertical_vel
 
-            if red_circle.horizontal_vel>0 and red_circle.stop_y_motion==True:
-
-                red_circle.horizontal_vel-=0.01
-                if red_circle.horizontal_vel<0:
-                    red_circle.horizontal_vel=0
-
-            if red_circle.horizontal_vel<0 and red_circle.stop_y_motion!=True:
-                red_circle.horizontal_vel+=3
-                if red_circle.horizontal_vel>0:
-                    red_circle.horizontal_vel=0
-
-            if red_circle.horizontal_vel<0 and red_circle.stop_y_motion==True:
-                red_circle.horizontal_vel+=0.01
-                if red_circle.horizontal_vel>0:
-                    red_circle.horizontal_vel=0
-
-
-            red_circle.vertical_vel+=vertical_velocity
-            red_circle.vertical_vel+=3
-            red_circle.vertical_vel = -red_circle.vertical_vel
-            if red_circle.vertical_vel == -abs(red_circle.vertical_vel):  #if vertical velocity is negative
-                red_circle.stop_y_motion=True
-                red_circle.vertical_vel=0
-                pygame.draw.circle(WIN, "red", (red_circle.x_pos, red_circle.y_pos), red_circle.radius, 0)
+            if red_circle.x_pos >= setting_obj.setting_side_width:
+                red_circle.horizontal_vel = -red_circle.horizontal_vel  # if ball goes over right-border
 
             if red_circle.x_pos<= 0:
                 red_circle.horizontal_vel=-red_circle.horizontal_vel
 
 
-    else:
-        pygame.draw.circle(WIN,"red",(red_circle.x_pos,red_circle.y_pos),red_circle.radius,0)
+    pygame.draw.circle(WIN,"red",(red_circle.x_pos,red_circle.y_pos),red_circle.radius,0)
