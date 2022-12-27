@@ -145,8 +145,11 @@ def init_buttons(WIN,setting_obj,red_circle,graphs):
     range_graph_toggle=Toggle(WIN,int(setting_obj.setting_side_width+setting_obj.vertical_width*0.7),
                           int(setting_obj.window_height*0.4375),30,24,startOn=False)
 
-    multiple_graphs_toggle=Toggle(WIN,int(setting_obj.setting_side_width+setting_obj.vertical_width*0.55),
-                                  int(setting_obj.window_height*0.63),30,24,startOn=False)
+    multiple_graphs_toggle=Toggle(WIN,int(setting_obj.setting_side_width+setting_obj.vertical_width*0.42),
+                                  int(setting_obj.window_height*0.59),30,24,startOn=False)
+
+    bounce_toggle=Toggle(WIN,int(setting_obj.setting_side_width+setting_obj.vertical_width*0.42),
+                                  int(setting_obj.window_height*0.645),30,24,startOn=False)
 
 
     menu_button = Button(WIN, setting_obj.setting_side_width + setting_obj.vertical_width*0.43,
@@ -165,7 +168,7 @@ def init_buttons(WIN,setting_obj,red_circle,graphs):
     axes_toggle=Toggle(WIN,int(setting_obj.setting_side_width+setting_obj.vertical_width*0.27),
                        int(setting_obj.window_height*0.79),30,24,startOn=False)
     return vertical_displacement_graph_toggle,velocity_graph_toggle,multiple_graphs_toggle,axes_toggle,\
-           displacement_graph_toggle,speed_graph_toggle,height_graph_toggle,range_graph_toggle
+           displacement_graph_toggle,speed_graph_toggle,height_graph_toggle,range_graph_toggle,bounce_toggle
 
 def init_sliders(WIN,setting_obj):
     vel_slider = Slider(WIN, int(setting_obj.setting_side_width + setting_obj.vertical_width * 0.32),
@@ -350,14 +353,16 @@ def set_background(setting_obj,WIN,font4,font3,font2):
 
 
 
-    multiple_graphs_label1=font2.render("Show multiple", True, "black")
+    multiple_graphs_label1=font2.render("Multiple lines", True, "black")
     multiple_graphs_rect1=multiple_graphs_label1.get_rect()
-    multiple_graphs_rect1.center=(setting_obj.setting_side_width+setting_obj.vertical_width*0.23,
-                                  setting_obj.window_height*0.62)
-    multiple_graphs_label2=font2.render("graphs", True, "black")
-    multiple_graphs_rect2=multiple_graphs_label2.get_rect()
-    multiple_graphs_rect2.center=(setting_obj.setting_side_width+setting_obj.vertical_width*0.23,
-                                  setting_obj.window_height*0.65)
+    multiple_graphs_rect1.center=(setting_obj.setting_side_width+setting_obj.vertical_width*0.18,
+                                  setting_obj.window_height*0.6)
+
+    bounce_label1=font2.render("Toggle Bounce", True, "black")
+    bounce_rect1=bounce_label1.get_rect()
+    bounce_rect1.center=(setting_obj.setting_side_width+setting_obj.vertical_width*0.18,
+                                  setting_obj.window_height*0.66)
+
 
     zoom_label=font2.render("Zoom", True, "black")
     zoom_rect=zoom_label.get_rect()
@@ -403,7 +408,7 @@ def set_background(setting_obj,WIN,font4,font3,font2):
     WIN.blit(label_under_toggle6_part2,rect_under_toggle6_part2)
     WIN.blit(zoom_label,zoom_rect)
     WIN.blit(multiple_graphs_label1,multiple_graphs_rect1)
-    WIN.blit(multiple_graphs_label2,multiple_graphs_rect2)
+    WIN.blit(bounce_label1,bounce_rect1)
     WIN.blit(pillar_label,pillar_rect)
     WIN.blit(axes_label,axes_rect)
     WIN.blit(friction1_label,friction1_rect)
