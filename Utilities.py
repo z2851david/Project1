@@ -153,7 +153,7 @@ def init_buttons(WIN,setting_obj,red_circle,graphs):
 
 
     menu_button = Button(WIN, setting_obj.setting_side_width + setting_obj.vertical_width*0.43,
-        setting_obj.window_height *0.85, 80, 80, text="Menu", onClick=lambda: menu_button_func(setting_obj),
+        setting_obj.window_height *0.85, 80, 80, text="Menu", onClick=lambda: menu_button_func(setting_obj,red_circle,graphs),
         fontSize=24)
 
     exit_button = Button(WIN, setting_obj.setting_side_width + setting_obj.vertical_width*0.64,
@@ -206,7 +206,7 @@ def init_sliders(WIN,setting_obj):
 
     friction_slider=Slider(WIN,int(setting_obj.setting_side_width+setting_obj.vertical_width*0.32),
                          int(setting_obj.window_height*0.282),setting_obj.vertical_width*0.37,20,
-                         min=0,max=1,step=0.05,initial=0)
+                         min=0,max=2,step=0.05,initial=0)
     output5=TextBox(WIN,setting_obj.setting_side_width+setting_obj.vertical_width*0.74,
                     int(setting_obj.window_height*0.273),40,40)
     output5.disable()
@@ -416,8 +416,10 @@ def set_background(setting_obj,WIN,font4,font3,font2):
 
 
 
-def menu_button_func(setting_obj):
+def menu_button_func(setting_obj,red_circle,graphs):
     setting_obj.menu1_on=True
+    setting_obj.close_main1=False
+    restart_button_func(setting_obj,red_circle,graphs)
 
 
 def display_information_text(red_circle,WIN,setting_obj):
