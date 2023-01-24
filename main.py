@@ -1,5 +1,4 @@
 import math
-
 import matplotlib.pyplot as plt
 import pygame,time,pygame_widgets
 from projectiles import initiate_circle, move_circle
@@ -12,15 +11,17 @@ from Utilities import display_information_text,init_buttons,set_background,init_
 
 
 
+
+
 class Settings():
     def __init__(self):
-        self.setting_projectile = ""
         self.setting_motion = ""
         self.menu1_on = True
         self.menu2_on = False
         self.is_run = False
         self.is_run_after = True
         self.reset_obj = True
+        self.close_main1=False
         self.window_size = pygame.display.get_desktop_sizes()
         self.window_width = self.window_size[0][0]
         self.window_height = self.window_size[0][1]
@@ -69,6 +70,7 @@ class Settings():
 
 
 def main_body():
+    pygame.init()
     setting_obj = Settings()
     setting_obj.window_width = 400
     setting_obj.window_height = 400
@@ -102,19 +104,16 @@ def main_body():
                 setting_obj.window_width = 400
                 setting_obj.window_height = 400
                 pygame.display.set_mode((setting_obj.window_width, setting_obj.window_height))
-                setting_obj.setting_motion, setting_obj.menu1_on, setting_obj.menu2_on \
-                    = menu1(WIN, setting_obj.window_width, setting_obj.window_height, font)
+                menu1(WIN, setting_obj, font)
 
             if setting_obj.menu2_on == True:
                 pygame.display.set_mode((setting_obj.window_width, setting_obj.window_height))
-                setting_obj.setting_projectile, setting_obj.menu1_on, setting_obj.menu2_on \
-                    = menu2(WIN, setting_obj.window_width, setting_obj.window_height,
-                            font)
+                setting_obj.setting_motion= menu2(WIN, setting_obj, font)
 
        #=======================================Initialise circle=====================================================#
         setting_obj.window_width = setting_obj.window_size[0][0]
         setting_obj.window_height = setting_obj.window_size[0][1]
-        if setting_obj.setting_projectile == "circle" and setting_obj.reset_obj == True:
+        if setting_obj.reset_obj == True:
             red_circle = initiate_circle(setting_obj.setting_motion,setting_obj)
             setting_obj.initial_y=red_circle.y_pos
             setting_obj.initial_x=red_circle.x_pos
@@ -179,22 +178,21 @@ def main_body():
                 quit()
 
 
-        if setting_obj.setting_projectile == "circle":
 
-            if setting_obj.is_run == False:
-                red_circle.set_vel(vel_slider.getValue(), angle_slider.getValue())
-                red_circle.drag_coefficient=friction_slider.getValue()
+        if setting_obj.is_run == False:
+            red_circle.set_vel(vel_slider.getValue(), angle_slider.getValue())
+            red_circle.drag_coefficient=friction_slider.getValue()
 
-                if setting_obj.setting_motion == "vertical":
-                    pygame.draw.circle(WIN, "red", (red_circle.x_pos, red_circle.y_pos), red_circle.radius,
+            if setting_obj.setting_motion == "vertical":
+                pygame.draw.circle(WIN, "red", (red_circle.x_pos, red_circle.y_pos), red_circle.radius,
                                        0)  # set the ball on the border
 
 
 
-                elif setting_obj.setting_motion == "horizontal":
-                    red_circle.y_pos = setting_obj.window_height // 1.3 - setting_obj.pillar_height * setting_obj.base_scale - \
+            elif setting_obj.setting_motion == "horizontal":
+                red_circle.y_pos = setting_obj.window_height // 1.3 - setting_obj.pillar_height * setting_obj.base_scale - \
                                        red_circle.radius
-                    pygame.draw.circle(WIN, "red", (red_circle.x_pos, red_circle.y_pos), red_circle.radius, 0)
+                pygame.draw.circle(WIN, "red", (red_circle.x_pos, red_circle.y_pos), red_circle.radius, 0)
 
 
 
@@ -203,27 +201,27 @@ def main_body():
 #===============================================Move object==========================================================#
 
 
-            elif setting_obj.is_run == True and setting_obj.is_run_after == True:
-                if setting_obj.displacement_time_counter==0:
-                    displacement_time_prev_time=time.time()
-                    setting_obj.displacement_time_counter=1
-                move_circle(red_circle, WIN, setting_obj)
+        elif setting_obj.is_run == True and setting_obj.is_run_after == True:
+            if setting_obj.displacement_time_counter==0:
+                isplacement_time_prev_time=time.time()
+                setting_obj.displacement_time_counter=1
+            move_circle(red_circle, WIN, setting_obj)
 
 
-            if setting_obj.is_run_after == False:
-                pygame.draw.circle(WIN, "red", (red_circle.x_pos, red_circle.y_pos), red_circle.radius, 0)
+        if setting_obj.is_run_after == False:
+            pygame.draw.circle(WIN, "red", (red_circle.x_pos, red_circle.y_pos), red_circle.radius, 0)
 
-            if not setting_obj.is_run_after:
-                if time_gap_counter==0:
-                    time_gap_start=time.time()
-                    time_gap_counter=1
-                    time_gap_counter2=0
-            else:
-                if time_gap_counter2==0:
-                    time_gap_end=time.time()-time_gap_start
-                    setting_obj.time_gap+=time_gap_end
-                    time_gap_counter=0
-                    time_gap_counter2=1
+        if not setting_obj.is_run_after:
+            if time_gap_counter==0:
+                time_gap_start=time.time()
+                time_gap_counter=1
+                time_gap_counter2=0
+        else:
+            if time_gap_counter2==0:
+                time_gap_end=time.time()-time_gap_start
+                setting_obj.time_gap+=time_gap_end
+                time_gap_counter=0
+                time_gap_counter2=1
 
 #=====================================DRAW PATH======================================================================#
 
