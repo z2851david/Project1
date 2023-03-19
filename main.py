@@ -1,9 +1,10 @@
+
 import math
 import matplotlib.pyplot as plt
 import pygame,time,pygame_widgets
 from projectiles import initiate_circle, move_circle
-from start_menu import menu1, menu2
-from Utilities import display_information_text,init_buttons,set_background,init_sliders,Graph
+from menus import menu1, menu2
+from Features import display_information_text,init_buttons,set_background,init_sliders,Graph,axes
 
 
 
@@ -15,9 +16,9 @@ from Utilities import display_information_text,init_buttons,set_background,init_
 
 class Settings():
     def __init__(self):
-        self.setting_motion = ""
-        self.menu1_on = True
-        self.menu2_on = False
+        self.setting_motion = "horizontal"
+        self.welcome_menu_on = False
+        self.second_menu_on = False
         self.is_run = False
         self.is_run_after = True
         self.reset_obj = True
@@ -98,21 +99,20 @@ def main_body():
 
     while running:  # main game loop
         # ============================================Main Menu=======================================================#
-        while setting_obj.menu1_on == True or setting_obj.menu2_on == True:
+        while setting_obj.welcome_menu_on == True or setting_obj.second_menu_on == True:
 
-            if setting_obj.menu1_on == True:
+            if setting_obj.welcome_menu_on == True:
                 setting_obj.window_width = 400
                 setting_obj.window_height = 400
                 pygame.display.set_mode((setting_obj.window_width, setting_obj.window_height))
                 menu1(WIN, setting_obj, font)
 
-            if setting_obj.menu2_on == True:
+            if setting_obj.second_menu_on == True:
                 pygame.display.set_mode((setting_obj.window_width, setting_obj.window_height))
-                setting_obj.setting_motion= menu2(WIN, setting_obj, font)
+                menu2(WIN, setting_obj, font)
 
        #=======================================Initialise circle=====================================================#
-        setting_obj.window_width = setting_obj.window_size[0][0]
-        setting_obj.window_height = setting_obj.window_size[0][1]
+
         if setting_obj.reset_obj == True:
             red_circle = initiate_circle(setting_obj.setting_motion,setting_obj)
             setting_obj.initial_y=red_circle.y_pos
@@ -121,16 +121,14 @@ def main_body():
 
 
         # ===================================Background==============================================================#
-        clock.tick(setting_obj.FPS)
-        if setting_obj.is_run_after:
-            trail_timer+=1
 
-        now_time=time.time()
-        setting_obj.delta_time=now_time-prev_time
-        prev_time=now_time
-        WIN = pygame.display.set_mode((setting_obj.window_width, setting_obj.window_height),
-                                      flags=pygame.SHOWN | pygame.FULLSCREEN)
+        setting_obj.window_width = setting_obj.window_size[0][0]
+        setting_obj.window_height = setting_obj.window_size[0][1]
+
         WIN.fill("#46aefc")
+        set_background(setting_obj, WIN, font4, font3, font2)
+
+        clock.tick(setting_obj.FPS)
 
         if setting_obj.initalise_counter==0:
             vertical_displacement_graph_toggle,vertical_velocity_graph_toggle,multiple_graphs_toggle,axes_toggle,\
@@ -141,6 +139,15 @@ def main_body():
             vel_slider,output,angle_slider,output2,zoom_slider,output3,pillar_slider,output4,friction_slider,output5\
                 =init_sliders(WIN,setting_obj)
             slider_counter = 1
+        if setting_obj.is_run_after:
+            trail_timer+=1
+
+        now_time=time.time()
+        setting_obj.delta_time=now_time-prev_time
+        prev_time=now_time
+        WIN = pygame.display.set_mode((setting_obj.window_width, setting_obj.window_height),
+                                      flags=pygame.SHOWN | pygame.FULLSCREEN)
+
 
 
 
@@ -153,23 +160,23 @@ def main_body():
 
         if setting_obj.is_run:
             if not red_circle.stop_y_motion and setting_obj.is_run_after:
-                height= (setting_obj.initial_y - red_circle.y_pos)/setting_obj.base_scale
-                length=red_circle.x_pos/setting_obj.base_scale
+                height= (setting_obj.initial_y - red_circle.y_pos)
+                length=red_circle.x_pos
                 graph_displacement=math.sqrt((length**2)+(height**2))
                 setting_obj.vertical_displacement_list[setting_obj.graph_list_n].append(height / setting_obj.scale)
                 setting_obj.horizontal_displacement_list[setting_obj.graph_list_n].append(length/setting_obj.scale)
                 setting_obj.angle_list[setting_obj.graph_list_n].append(red_circle.delta_theta)
                 displacement_time_now_time = time.time()
-                displacement_time_delta_time = displacement_time_now_time - displacement_time_prev_time
+                displacement_time_delta_time = displacement_time_now_time - displacement_time_prev_time -setting_obj.time_gap
 
                 setting_obj.time_list[setting_obj.graph_list_n].append(
-                    displacement_time_delta_time-setting_obj.time_gap)
+                    displacement_time_delta_time)
                 setting_obj.vertical_velocity_list[setting_obj.graph_list_n].append(red_circle.vertical_vel)
-                setting_obj.displacement_list[setting_obj.graph_list_n].append(graph_displacement)
+                setting_obj.displacement_list[setting_obj.graph_list_n].append(graph_displacement/setting_obj.scale)
                 setting_obj.speed_list[setting_obj.graph_list_n].append(red_circle.current_velocity)
 
 
-#===================================================================================================================]
+#=====================================Set values from sliders=============================================================================]
 
 
 
@@ -203,7 +210,7 @@ def main_body():
 
         elif setting_obj.is_run == True and setting_obj.is_run_after == True:
             if setting_obj.displacement_time_counter==0:
-                isplacement_time_prev_time=time.time()
+                displacement_time_prev_time=time.time()
                 setting_obj.displacement_time_counter=1
             move_circle(red_circle, WIN, setting_obj)
 
@@ -314,60 +321,18 @@ def main_body():
                                    red_circle.radius, setting_obj.pillar_height*setting_obj.base_scale)
         if setting_obj.setting_motion=="horizontal":
             pygame.draw.rect(WIN,"brown",pillar_rect)
-        set_background(setting_obj, WIN, font4, font3, font2)
         if not red_circle.y_pos-20<=0 and red_circle.vertical_vel>=0 and not red_circle.stop_y_motion:
             setting_obj.lines_height = red_circle.y_pos
         if red_circle.horizontal_vel >= 0 and not red_circle.x_pos + 50 >= setting_obj.setting_side_width:
             setting_obj.lines_displacement = red_circle.x_pos
 
-        if axes_toggle.getValue() and setting_obj.setting_motion=="horizontal":
+        axes(axes_toggle,setting_obj,WIN,red_circle,font5)
 
-            if not setting_obj.is_run:
-                y_ax=pygame.rect.Rect(30,setting_obj.window_height//1.3,10,0)
-            else:
-                y_ax=pygame.rect.Rect(30,setting_obj.lines_height,10,
-                                        setting_obj.window_height//1.3-setting_obj.lines_height+1)
-            pygame.draw.rect(WIN,"black",y_ax,5,0)
-            if red_circle.stop_y_motion:
-                if (setting_obj.window_height//1.3)-setting_obj.lines_height < 100:
-                    height_iterator = round(((setting_obj.window_height//1.3)-setting_obj.lines_height)/ 10)
-                else:
-                    height_iterator = round(((setting_obj.window_height//1.3)-setting_obj.lines_height) / 100)
-                for n in range(height_iterator+1):
-                    temp_height = ((setting_obj.window_height//1.3-setting_obj.lines_height)/height_iterator) * n
-                    sub_y_ax = pygame.rect.Rect(20,setting_obj.window_height//1.3-temp_height, 14, 5)
-                    pygame.draw.rect(WIN, "black", sub_y_ax, 5, 0)
-                    y_axis_ticks = font5.render(f"{round(temp_height/ setting_obj.scale)}m", True, "black")
-                    y_axis_ticks_rect = y_axis_ticks.get_rect()
-                    y_axis_ticks_rect.center = (10, setting_obj.window_height//1.3-temp_height)
-                    WIN.blit(y_axis_ticks, y_axis_ticks_rect)
 
-        if axes_toggle.getValue() and setting_obj.setting_motion=="horizontal":
 
-            if not setting_obj.is_run:
-                setting_obj.lines_displacement = 0
-            if red_circle.stop_y_motion:
-                if setting_obj.lines_displacement<100:
-                    displacement_iterator=round(setting_obj.lines_displacement/10)
-                else:
-                    displacement_iterator=round(setting_obj.lines_displacement / 100)
-                for n in range(displacement_iterator+1):
-                    temp_displacement=(setting_obj.lines_displacement/displacement_iterator)*n
-                    sub_x_ax=pygame.rect.Rect(temp_displacement+30
-                                                ,setting_obj.window_height//1.3,6,20)
-                    pygame.draw.rect(WIN, "black", sub_x_ax, 5, 0)
-                    x_axis_ticks=font5.render(f"{round(temp_displacement/setting_obj.scale)}m",True,"black")
-                    x_axis_ticks_rect=x_axis_ticks.get_rect()
-                    x_axis_ticks_rect.center=(temp_displacement+35,setting_obj.window_height//1.3+27)
-                    WIN.blit(x_axis_ticks,x_axis_ticks_rect)
 
-            x_ax=pygame.rect.Rect(30,setting_obj.window_height//1.3,setting_obj.lines_displacement,10)
-            pygame.draw.rect(WIN,"black",x_ax,5,0)
 
         setting_obj.bounce=bounce_toggle.getValue()
-
-
-
         display_information_text(red_circle, WIN,setting_obj)
         output.setText(vel_slider.getValue())
         output2.setText(angle_slider.getValue())
